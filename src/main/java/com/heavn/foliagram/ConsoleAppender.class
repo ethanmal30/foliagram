@@ -34,6 +34,10 @@ public class ConsoleAppender extends AbstractAppender {
         String message = event.getMessage().getFormattedMessage();
         String cleanMessage = colorPattern.matcher(message).replaceAll("");
 
+        if (cleanMessage.contains("Connection reset") && event.getLevel().name().equals("ERROR")) {
+            return;
+        }
+
         int level = plugin.getLogLevel();
         if (level < 4) {
             boolean isChat = cleanMessage.matches(".*<[a-zA-Z0-9_]+> .*") || cleanMessage.startsWith("[Server] ");
