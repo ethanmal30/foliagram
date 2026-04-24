@@ -1,4 +1,4 @@
-# FoliaGram 📱⛏️
+# FoliaGram
 
 **Connect your Folia server straight to your pocket.**
 
@@ -6,7 +6,7 @@ FoliaGram is a lightweight, multithread-safe Telegram bridge built exclusively f
 
 ![Example](https://i.imgur.com/j3UduIY.png)
 
-### ✨ Features
+### Features
 * **Real-Time Console Mirror:** Watch your server logs live from your phone.
 * **Remote Commands:** Execute console commands securely via Telegram.
 * **Chat Bridge:** See player chats, joins, and leaves instantly.
@@ -14,7 +14,7 @@ FoliaGram is a lightweight, multithread-safe Telegram bridge built exclusively f
 * **Folia Native:** Built natively for Folia's `GlobalRegionScheduler` and `AsyncScheduler` to ensure zero TPS impact and strict thread safety.
 * **Secure:** Locked strictly to your personal Telegram User ID. 
 
-### 🚀 Installation
+### Installation
 1. Drop `FoliaGram-1.0.jar` into your `plugins` folder.
 2. Restart the server.
 3. Open `plugins/FoliaGram/config.yml` and paste your Bot Token and Telegram ID.
