@@ -1,9 +1,12 @@
 package com.heavn.foliagram;
 
 import org.bukkit.Bukkit;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.concurrent.TimeUnit;
 
 public class TelegramHandler extends TelegramLongPollingBot {
 
@@ -12,8 +15,8 @@ public class TelegramHandler extends TelegramLongPollingBot {
     private final String botToken;
     private final long adminUserId;
 
-    public TelegramHandler(FoliaGram plugin) {
-        super(plugin.getConfig().getString("bot-token"));
+    public TelegramHandler(FoliaGram plugin, DefaultBotOptions options) {
+        super(options, plugin.getConfig().getString("bot-token"));
         this.plugin = plugin;
         this.botUsername = plugin.getConfig().getString("bot-username");
         this.botToken = plugin.getConfig().getString("bot-token");
@@ -53,7 +56,13 @@ public class TelegramHandler extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (Exception e) {
-            plugin.getLogger().severe("Could not send message to Telegram: " + e.getMessage());
+            Bukkit.getAsyncScheduler().runDelayed(plugin, task -> {
+                try {
+                    execute(message);
+                } catch (Exception retryException) {
+                    plugin.getLogger().warning("Telegram network drop: Failed to send message after retry.");
+                }
+            }, 1, TimeUnit.SECONDS);
         }
     }
 
