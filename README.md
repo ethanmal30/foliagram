@@ -4,6 +4,8 @@
 
 FoliaGram is a lightweight, multithread-safe Telegram bridge built exclusively for Minecraft Folia 1.21+. It transforms your Telegram app into a remote control panel and a 1:1 real-time console mirror.
 
+![Example](https://i.imgur.com/j3UduIY.png)
+
 ### ✨ Features
 * **Real-Time Console Mirror:** Watch your server logs live from your phone.
 * **Remote Commands:** Execute console commands securely via Telegram.
