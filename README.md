@@ -15,7 +15,7 @@ FoliaGram is a lightweight, multithread-safe Telegram bridge built exclusively f
 * **Secure:** Locked strictly to your personal Telegram User ID. 
 
 ### Installation
-1. Drop `FoliaGram-1.0.jar` into your `plugins` folder.
+1. Drop `FoliaGram-1.0.1.jar` into your `plugins` folder.
 2. Restart the server.
 3. Open `plugins/FoliaGram/config.yml` and paste your Bot Token and Telegram ID.
 4. Restart once more and hit `/start` on your bot in Telegram!
