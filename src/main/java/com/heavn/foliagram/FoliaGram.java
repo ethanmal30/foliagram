@@ -3,6 +3,7 @@ package com.heavn.foliagram;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
@@ -18,8 +19,8 @@ public class FoliaGram extends JavaPlugin {
         this.logLevel = getConfig().getInt("log-level", 4);
 
         if (getConfig().getString("bot-token", "").equals("YOUR_BOT_TOKEN_HERE") ||
-                getConfig().getString("bot-username", "").equals("YourBotUsername") ||
-                getConfig().getLong("admin-user-id", 0) == 123456789L) {
+                getConfig().getString("bot-username", "").equals("YOUR_BOT_USERNAME") ||
+                getConfig().getLong("admin-user-id", 0) == 1234567890) {
 
             getLogger().severe("Please fully configure your config.yml! (Token, Username, or Admin ID is missing)");
             getServer().getPluginManager().disablePlugin(this);
@@ -28,7 +29,11 @@ public class FoliaGram extends JavaPlugin {
 
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            telegramHandler = new TelegramHandler(this);
+
+            DefaultBotOptions botOptions = new DefaultBotOptions();
+            botOptions.setMaxThreads(2);
+
+            telegramHandler = new TelegramHandler(this, botOptions);
             botsApi.registerBot(telegramHandler);
             getLogger().info("Telegram bot connected successfully!");
 
