@@ -1,0 +1,85 @@
+package com.heavn.foliagram;
+
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.bukkit.Bukkit;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+public class ConsoleAppender extends AbstractAppender {
+
+    private final FoliaGram plugin;
+    private final TelegramHandler telegramHandler;
+    private final StringBuilder buffer = new StringBuilder();
+
+    private final Pattern colorPattern = Pattern.compile("(?i)§[0-9A-FK-OR]|\\x1B\\[[0-9;]*[mK]");
+
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+
+    public ConsoleAppender(FoliaGram plugin, TelegramHandler telegramHandler) {
+        super("FoliaGramAppender", null, null, true, Property.EMPTY_ARRAY);
+        this.plugin = plugin;
+        this.telegramHandler = telegramHandler;
+
+        Bukkit.getAsyncScheduler().runAtFixedRate(plugin, task -> flushBuffer(), 2, 2, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void append(LogEvent event) {
+        String message = event.getMessage().getFormattedMessage();
+        String cleanMessage = colorPattern.matcher(message).replaceAll("");
+
+        int level = plugin.getLogLevel();
+        if (level < 4) {
+            boolean isChat = cleanMessage.matches(".*<[a-zA-Z0-9_]+> .*") || cleanMessage.startsWith("[Server] ");
+            boolean isJoinLeave = cleanMessage.contains("joined the game") || cleanMessage.contains("left the game") || cleanMessage.contains("lost connection:") || cleanMessage.contains("logged in with entity id");
+            boolean isCommand = cleanMessage.contains("issued server command:") || cleanMessage.matches(".*\\[[a-zA-Z0-9_]+: .+\\].*");
+            boolean isErrorWarn = event.getLevel().name().equals("WARN") || event.getLevel().name().equals("ERROR") || event.getLevel().name().equals("FATAL");
+
+            boolean shouldLog = false;
+
+            if (level >= 1 && (isChat || isJoinLeave)) {
+                shouldLog = true;
+            }
+            if (level >= 2 && isCommand) {
+                shouldLog = true;
+            }
+            if (level >= 3 && isErrorWarn) {
+                shouldLog = true;
+            }
+
+            if (!shouldLog) {
+                return;
+            }
+        }
+
+        String timeStr = timeFormatter.format(Instant.ofEpochMilli(event.getTimeMillis()));
+        String prefix = "[" + timeStr + " " + event.getLevel().name() + "]: ";
+
+        String logLine = prefix + cleanMessage.replace("\n", "\n" + prefix) + "\n";
+
+        synchronized (buffer) {
+            buffer.append(logLine);
+
+            if (buffer.length() > 3500) {
+                flushBuffer();
+            }
+        }
+    }
+
+    private void flushBuffer() {
+        String toSend;
+        synchronized (buffer) {
+            if (buffer.isEmpty()) return;
+            toSend = buffer.toString();
+            buffer.setLength(0);
+        }
+
+        telegramHandler.sendToAdmin(toSend);
+    }
+}
